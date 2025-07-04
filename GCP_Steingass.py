@@ -1,3 +1,5 @@
+
+
 import numpy as np
 
 print('hello world')
@@ -14,3 +16,4 @@ print("Array A:", a)
 print("Array B:", b)
 print("A + B =", c)
 
+print('project finished')
