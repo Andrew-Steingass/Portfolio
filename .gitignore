@@ -1,0 +1,61 @@
+#--------------------------------------------------
+#  OS‑specific clutter
+#--------------------------------------------------
+.DS_Store
+Thumbs.db
+Icon?
+ehthumbs.db
+Desktop.ini
+
+#--------------------------------------------------
+#  Editor / IDE settings
+#--------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*~
+
+#--------------------------------------------------
+#  Node / JavaScript builds
+#--------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+*.tsbuildinfo
+
+#--------------------------------------------------
+#  Static‑site generators (Hugo, Next, Astro, etc.)
+#--------------------------------------------------
+public/
+dist/
+build/
+.resources/          # Hugo <0.125
+resources/_gen/      # Hugo >=0.125
+hugo_stats.json
+.cache/
+astro/
+.next/
+
+#--------------------------------------------------
+#  Python / Go leftovers (in case you run scripts)
+#--------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.env.*               # picks up .env.local, .env.production, etc.
+
+#--------------------------------------------------
+#  Logs & misc
+#--------------------------------------------------
+*.log
+*.sqlite3
+*.tgz
+*.zip
+*.bak
+*.tmp
+*.orig
+*.patch
