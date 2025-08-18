@@ -82,4 +82,9 @@ __pycache__/
 vendor/
 
 # Go workspace file
-go.work
+go.workvenv/
+venv/
+
+.csv
+
+README basic python stuff .md
