@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: ./nlp_app      # your Dockerfile is here
+    container_name: nlp_app
+    ports:
+      - "8000:8000"           # host:container
+    env_file:
+      - ./nlp_app/.env        # if you use one (RDS URL, etc.)
+    restart: unless-stopped
