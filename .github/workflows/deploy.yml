@@ -19,16 +19,15 @@ jobs:
           script_stop: true
           script: |
             set -euo pipefail
-            cd "${PROD_PATH}"
+            cd "${{ vars.PROD_PATH }}"
 
             echo "Pulling latest code from origin/main..."
             git fetch --all
             git reset --hard origin/main
 
             echo "Rebuilding & (re)starting containers..."
-            # If your compose builds from the local Dockerfile:
             docker compose build --pull
             docker compose up -d --remove-orphans
 
-            # Optional cleanup (keeps disk tidy)
             docker system prune -f
+
