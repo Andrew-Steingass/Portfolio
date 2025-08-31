@@ -2,11 +2,12 @@ name: Auto Deploy on Push
 
 on:
   push:
-    branches: [ main ]  # change if you want develop, etc.
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -19,16 +20,14 @@ jobs:
           script: |
             set -euo pipefail
             cd "${{ secrets.PROD_PATH }}"
-            echo "At path:" && pwd
-            echo "Listing:" && ls -la
 
-            echo "Pulling latest..."
+            echo "Pulling latest code..."
             git fetch --all
             git reset --hard origin/main
 
-            echo "Rebuild & restart..."
+            echo "Rebuilding & restarting containers..."
+            docker compose down
             docker compose build --pull
             docker compose up -d --remove-orphans
 
             docker system prune -f
-
