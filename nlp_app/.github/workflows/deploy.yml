@@ -1,0 +1,34 @@
+name: Auto Deploy on Push
+
+on:
+  push:
+    branches: [ main ]  # change if you want develop, etc.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy over SSH (git pull + docker compose up -d)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_HOST }}          # e.g. 54.12.34.56 or myserver.example.com
+          username: ${{ secrets.PROD_USER }}      # e.g. ubuntu, ec2-user, andy, etc.
+          key: ${{ secrets.PROD_SSH_KEY }}        # OpenSSH private key contents
+          port: ${{ secrets.PROD_SSH_PORT }}      # optional; set if not 22
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd "${PROD_PATH}"
+
+            echo "Pulling latest code from origin/main..."
+            git fetch --all
+            git reset --hard origin/main
+
+            echo "Rebuilding & (re)starting containers..."
+            # If your compose builds from the local Dockerfile:
+            docker compose build --pull
+            docker compose up -d --remove-orphans
+
+            # Optional cleanup (keeps disk tidy)
+            docker system prune -f

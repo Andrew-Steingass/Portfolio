@@ -1,0 +1,8 @@
+numpy==1.26.4
+pandas==2.2.2
+openai==1.40.6
+python-dotenv
+scikit-learn
+flask
+pytest
+pytest-flask
