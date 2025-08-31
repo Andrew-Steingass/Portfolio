@@ -3,10 +3,24 @@ version: "3.9"
 services:
   app:
     build:
-      context: ./nlp_app      # your Dockerfile is here
+      context: ./nlp_app
     container_name: nlp_app
     ports:
-      - "8000:8000"           # host:container
-    env_file:
-      - ./nlp_app/.env        # if you use one (RDS URL, etc.)
+      - "8000:8000"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
     restart: unless-stopped
