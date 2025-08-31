@@ -502,8 +502,8 @@ def process_batches_progressively(batches, tfidf_results, incoming_dict, api_key
 # Usage with your updated structure
 #fpath = fr"C:\Users\Andy\Downloads\dataset.csv"
 #df = pd.read_csv(fpath)
-n_rows = 100
-df = pull_data(N_rows)
+n_rows = 5
+df = pull_data(n_rows)
 source_df = df[['title_right','description_right','brand_right']]
 lookup_df = df[['title_left','description_left']]
 
