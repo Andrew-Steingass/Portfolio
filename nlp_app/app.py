@@ -595,6 +595,7 @@ def process_data():
             print(f"Error in create_chatgpt_batches: {e}", flush=True)
             return jsonify({"error": f"Error creating batches: {str(e)}", "traceback": traceback.format_exc()}), 500
 
+
         # Get API key (try both spellings)
         api_key = os.getenv("openai_secret_key")
         print(f"DEBUG API key found: {api_key[:5]}", flush=True)
