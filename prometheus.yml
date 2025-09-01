@@ -1,8 +1,11 @@
 global:
-  scrape_interval: 15s  # how often to scrape targets
+  scrape_interval: 15s
 
 scrape_configs:
-  # Scrape Prometheus itself
   - job_name: "prometheus"
     static_configs:
       - targets: ["localhost:9090"]
+
+  - job_name: "flask_app"
+    static_configs:
+      - targets: ["app:8000"]   # use service name "app" from docker-compose

@@ -11,6 +11,8 @@ import io
 from dotenv import load_dotenv
 import traceback
 import sys
+from prometheus_flask_exporter import PrometheusMetrics
+
 
 # Load environment variables first
 load_dotenv()
@@ -33,7 +35,7 @@ except Exception as e:
     pull_data = None
 
 app = Flask(__name__)
-
+metrics = PrometheusMetrics(app)
 # Enable debug mode and better error handling
 app.config['DEBUG'] = True
 app.config['PROPAGATE_EXCEPTIONS'] = True

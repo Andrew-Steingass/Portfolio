@@ -6,3 +6,4 @@ scikit-learn
 flask
 pytest
 pytest-flask
+prometheus-flask-exporter
