@@ -11,8 +11,6 @@ import io
 from dotenv import load_dotenv
 import traceback
 import sys
-from prometheus_flask_exporter import PrometheusMetrics
-
 
 # Load environment variables first
 load_dotenv()
@@ -35,10 +33,34 @@ except Exception as e:
     pull_data = None
 
 app = Flask(__name__)
-metrics = PrometheusMetrics(app)
 # Enable debug mode and better error handling
 app.config['DEBUG'] = True
 app.config['PROPAGATE_EXCEPTIONS'] = True
+
+# Initialize Prometheus metrics AFTER creating the app
+# REMOVE the duplicate metrics initialization - use only prometheus-flask-exporter
+try:
+    from prometheus_flask_exporter import PrometheusMetrics
+    
+    # Initialize with app
+    metrics = PrometheusMetrics(app)
+    
+    # Optional: Add custom metrics
+    metrics.info('app_info', 'Application info', version='1.0.0')
+    
+    # You can add custom metrics like this:
+    # processing_counter = metrics.counter(
+    #     'nlp_processing_total', 'Total NLP processing requests',
+    #     labels={'status': lambda: request.endpoint}
+    # )
+    
+    print("✓ Prometheus metrics initialized successfully")
+    print("✓ Metrics endpoint available at /metrics")
+    
+except Exception as e:
+    print(f"Warning: Could not initialize prometheus_flask_exporter: {e}")
+    print("You may need to install it: pip install prometheus-flask-exporter")
+    metrics = None
 
 # Add a global error handler
 @app.errorhandler(Exception)
@@ -528,9 +550,27 @@ def process_batches_progressively(batches, tfidf_results, incoming_dict, api_key
     
     return final_df, all_chatgpt_results
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/health')
+def health():
+    """Health check endpoint"""
+    return jsonify({"status": "healthy", "service": "nlp_app"})
+
+@app.route('/status')
+def status():
+    return jsonify({"status": "running", "message": "NLP API is healthy"})
+
+@app.route('/routes')
+def list_routes():
+    routes = []
+    for rule in app.url_map.iter_rules():
+        routes.append(f"{rule.rule} - {list(rule.methods)}")
+    return "<br>".join(routes)
+
 
 @app.route('/process', methods=['POST'])
 def process_data():
@@ -653,12 +693,42 @@ def process_data():
             "traceback": traceback.format_exc()
         }), 500
 
-@app.route('/status')
-def status():
-    return jsonify({"status": "running", "message": "NLP API is healthy"})
 
 if __name__ == '__main__':
     print("Starting Flask app...", flush=True)
     print(f"OpenAI available: {OpenAI is not None}", flush=True)
     print(f"pull_data available: {pull_data is not None}", flush=True)
+    
+    # List all routes
+    print("\nAvailable routes:")
+    with app.test_request_context():
+        for rule in app.url_map.iter_rules():
+            print(f"  {rule.rule} - {list(rule.methods - {'HEAD', 'OPTIONS'})}")
+    
+    # Test if metrics endpoint exists
+    print("\nTesting endpoints:")
+    try:
+        with app.test_client() as client:
+            # Test metrics
+            response = client.get('/metrics')
+            if response.status_code == 200:
+                print(f"✓ Metrics endpoint: OK (status {response.status_code})")
+                # Show a sample of the metrics
+                metrics_data = response.data.decode('utf-8')
+                lines = metrics_data.split('\n')[:5]
+                print("  Sample metrics:")
+                for line in lines:
+                    if line and not line.startswith('#'):
+                        print(f"    {line[:80]}...")
+                        break
+            else:
+                print(f"✗ Metrics endpoint: Failed (status {response.status_code})")
+            
+            # Test health
+            response = client.get('/health')
+            print(f"✓ Health endpoint: OK (status {response.status_code})")
+            
+    except Exception as e:
+        print(f"⚠ Endpoint test failed: {e}")
+    
     app.run(host='0.0.0.0', port=8000, debug=True)

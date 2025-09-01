@@ -1,5 +1,4 @@
 version: "3.9"
-
 services:
   app:
     build:
@@ -7,8 +6,11 @@ services:
     container_name: nlp_app
     ports:
       - "8000:8000"
+    environment:
+      - DEBUG_METRICS=1
+    env_file:
+      - ./nlp_app/.env
     restart: unless-stopped
-
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -17,7 +19,6 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     restart: unless-stopped
-
   grafana:
     image: grafana/grafana
     container_name: grafana
